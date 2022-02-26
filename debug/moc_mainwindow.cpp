@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[10];
-    char stringdata0[120];
+    QByteArrayData data[13];
+    char stringdata0[164];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,18 +36,22 @@ QT_MOC_LITERAL(0, 0, 10), // "MainWindow"
 QT_MOC_LITERAL(1, 11, 11), // "serial_sent"
 QT_MOC_LITERAL(2, 23, 0), // ""
 QT_MOC_LITERAL(3, 24, 11), // "const char*"
-QT_MOC_LITERAL(4, 36, 9), // "callbacks"
-QT_MOC_LITERAL(5, 46, 16), // "write_to_arduino"
-QT_MOC_LITERAL(6, 63, 18), // "update_position_UI"
-QT_MOC_LITERAL(7, 82, 11), // "move_gantry"
-QT_MOC_LITERAL(8, 94, 11), // "zero_gantry"
-QT_MOC_LITERAL(9, 106, 13) // "center_gantry"
+QT_MOC_LITERAL(4, 36, 9), // "enableDAQ"
+QT_MOC_LITERAL(5, 46, 10), // "disableDAQ"
+QT_MOC_LITERAL(6, 57, 14), // "enableJoystick"
+QT_MOC_LITERAL(7, 72, 16), // "write_to_arduino"
+QT_MOC_LITERAL(8, 89, 18), // "update_position_UI"
+QT_MOC_LITERAL(9, 108, 11), // "move_gantry"
+QT_MOC_LITERAL(10, 120, 11), // "zero_gantry"
+QT_MOC_LITERAL(11, 132, 13), // "center_gantry"
+QT_MOC_LITERAL(12, 146, 17) // "update_ATI_labels"
 
     },
     "MainWindow\0serial_sent\0\0const char*\0"
-    "callbacks\0write_to_arduino\0"
-    "update_position_UI\0move_gantry\0"
-    "zero_gantry\0center_gantry"
+    "enableDAQ\0disableDAQ\0enableJoystick\0"
+    "write_to_arduino\0update_position_UI\0"
+    "move_gantry\0zero_gantry\0center_gantry\0"
+    "update_ATI_labels"
 };
 #undef QT_MOC_LITERAL
 
@@ -57,7 +61,7 @@ static const uint qt_meta_data_MainWindow[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       7,   14, // methods
+      10,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -65,23 +69,29 @@ static const uint qt_meta_data_MainWindow[] = {
        1,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   49,    2, 0x06 /* Public */,
+       1,    1,   64,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       4,    0,   52,    2, 0x08 /* Private */,
-       5,    1,   53,    2, 0x08 /* Private */,
-       6,    1,   56,    2, 0x08 /* Private */,
-       7,    0,   59,    2, 0x08 /* Private */,
-       8,    0,   60,    2, 0x08 /* Private */,
-       9,    0,   61,    2, 0x08 /* Private */,
+       4,    0,   67,    2, 0x0a /* Public */,
+       5,    0,   68,    2, 0x0a /* Public */,
+       6,    0,   69,    2, 0x0a /* Public */,
+       7,    1,   70,    2, 0x08 /* Private */,
+       8,    1,   73,    2, 0x08 /* Private */,
+       9,    0,   76,    2, 0x08 /* Private */,
+      10,    0,   77,    2, 0x08 /* Private */,
+      11,    0,   78,    2, 0x08 /* Private */,
+      12,    0,   79,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    2,
 
  // slots: parameters
     QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void, 0x80000000 | 3,    2,
     QMetaType::Void, QMetaType::QStringList,    2,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -96,12 +106,15 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->serial_sent((*reinterpret_cast< const char*(*)>(_a[1]))); break;
-        case 1: _t->callbacks(); break;
-        case 2: _t->write_to_arduino((*reinterpret_cast< const char*(*)>(_a[1]))); break;
-        case 3: _t->update_position_UI((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
-        case 4: _t->move_gantry(); break;
-        case 5: _t->zero_gantry(); break;
-        case 6: _t->center_gantry(); break;
+        case 1: _t->enableDAQ(); break;
+        case 2: _t->disableDAQ(); break;
+        case 3: _t->enableJoystick(); break;
+        case 4: _t->write_to_arduino((*reinterpret_cast< const char*(*)>(_a[1]))); break;
+        case 5: _t->update_position_UI((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
+        case 6: _t->move_gantry(); break;
+        case 7: _t->zero_gantry(); break;
+        case 8: _t->center_gantry(); break;
+        case 9: _t->update_ATI_labels(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -145,13 +158,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 7)
+        if (_id < 10)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 7;
+        _id -= 10;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 7)
+        if (_id < 10)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 7;
+        _id -= 10;
     }
     return _id;
 }

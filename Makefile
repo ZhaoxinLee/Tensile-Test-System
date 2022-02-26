@@ -259,12 +259,14 @@ Makefile: test\test.pro ..\..\..\..\Qt\5.15.2\msvc2019_64\mkspecs\features\spec_
 		..\..\..\..\Qt\5.15.2\msvc2019_64\mkspecs\features\yacc.prf \
 		..\..\..\..\Qt\5.15.2\msvc2019_64\mkspecs\features\lex.prf \
 		test\test.pro \
+		..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Gamepad.prl \
 		..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Widgets.prl \
 		..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Gui.prl \
 		..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5SerialPort.prl \
 		..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Core.prl \
 		..\..\..\..\Qt\5.15.2\msvc2019_64\lib\qtmain.prl \
 		..\..\..\..\Qt\5.15.2\msvc2019_64\mkspecs\features\build_pass.prf \
+		..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Gamepadd.prl \
 		..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Widgetsd.prl \
 		..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Guid.prl \
 		..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5SerialPortd.prl \
@@ -446,12 +448,14 @@ Makefile: test\test.pro ..\..\..\..\Qt\5.15.2\msvc2019_64\mkspecs\features\spec_
 ..\..\..\..\Qt\5.15.2\msvc2019_64\mkspecs\features\yacc.prf:
 ..\..\..\..\Qt\5.15.2\msvc2019_64\mkspecs\features\lex.prf:
 test\test.pro:
+..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Gamepad.prl:
 ..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Widgets.prl:
 ..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Gui.prl:
 ..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5SerialPort.prl:
 ..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Core.prl:
 ..\..\..\..\Qt\5.15.2\msvc2019_64\lib\qtmain.prl:
 ..\..\..\..\Qt\5.15.2\msvc2019_64\mkspecs\features\build_pass.prf:
+..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Gamepadd.prl:
 ..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Widgetsd.prl:
 ..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5Guid.prl:
 ..\..\..\..\Qt\5.15.2\msvc2019_64\lib\Qt5SerialPortd.prl:

@@ -9,25 +9,43 @@ daq::~daq() {
 }
 
 bool daq::isEnabled( void ) {
-    return enableDAQ;
+    return DAQ_enabled;
+}
+
+bool daq::enable( void ) {
+    if (!DAQ_enabled)
+    {
+        DAQ_enabled = true;
+    }
+    return DAQ_enabled;
+}
+
+bool daq::disable( void ) {
+    if (DAQ_enabled)
+    {
+        DAQ_enabled = false;
+    }
+    return DAQ_enabled;
 }
 
 void daq::setupTask(void)
 {
+    // Voltage readings are set to max and mins of +-10 V
+    // Recommended sampleRate = 10000.0;
+    // Recommended numSamples = 10;
     DAQmxCreateTask("MyTask", &taskHandle);
     DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai0:7", "8_AI_Channels", DAQmx_Val_Cfg_Default, -10, 10, DAQmx_Val_Volts, nullptr);
     DAQmxCfgSampClkTiming(taskHandle, "", sampleRate, DAQmx_Val_Rising, DAQmx_Val_FiniteSamps, numSamples);
 }
 
-void daq::finishTask()
+void daq::finishTask(void)
 {
     if( DAQmxFailed(error) )
     {
-            DAQmxGetExtendedErrorInfo(errBuff,2048);
+        DAQmxGetExtendedErrorInfo(errBuff,2048);
     }
     if( taskHandle!=nullptr )
     {
-
         DAQmxClearTask(taskHandle);
     }
     if( DAQmxFailed(error) )
@@ -36,12 +54,16 @@ void daq::finishTask()
     }
 }
 
+void daq::stopTask(void)
+{
+    DAQmxStopTask(taskHandle);
+    DAQmxClearTask(taskHandle);
+}
+
 
 void daq::setNumSamples(int numSamp)
 {
-
     // TODO: check for application start first
-
     if (numSamp < maxSamples)
     {
         numSamples = numSamp;
@@ -59,27 +81,16 @@ void daq::setSampleRate(double sampRate)
     sampleRate = sampRate;
 }
 
-void daq::dataAcquisition(void)
+void daq::dataAcquisition(double datastream[8])
 {
-
-    // Voltage readings are set to max and mins of +-10 V
-
-    // Recommended sampleRate = 10000.0;
-    // Recommended numSamples = 10;
-
-    DAQmxCreateTask("MyTask", &taskHandle);
-    DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai0:7", "8_AI_Channels", DAQmx_Val_Cfg_Default, -10, 10, DAQmx_Val_Volts, nullptr);
-    DAQmxCfgSampClkTiming(taskHandle, "", sampleRate, DAQmx_Val_Rising, DAQmx_Val_FiniteSamps, numSamples);
     // Start Code
     DAQmxStartTask(taskHandle);
     // Read Code
-    // This could be the part that is repeated and cut out the top and bottom code to speed up calcs.
     DAQmxReadAnalogF64(taskHandle, numSamples, timeout, DAQmx_Val_GroupByChannel, data, 8*numSamples, &samplesReceived, nullptr);
 
     if( samplesReceived > 0 )
     {
-        qInfo() << "Acquired " << (int)samplesReceived << " samples.";
-
+        //qInfo() << "Acquired " << (int)samplesReceived << " samples.";
         for (int i = 0; i < 8; i++)
         {
             double sum = 0.0;
@@ -89,8 +100,7 @@ void daq::dataAcquisition(void)
                 //qDebug() << "Datapoint: " << i*numSamples+j << " is " << data[i*numSamples+j];
             }
             // Average over numSamples is the value measured
-            analogInputVoltages[i] = sum/numSamples;
-            qDebug() << "Datapoint: " << i << " is " << analogInputVoltages[i];
+            datastream[i] = sum/numSamples;
         }
     }
     else
@@ -98,10 +108,46 @@ void daq::dataAcquisition(void)
         qInfo() << "No samples were read.";
     }
 
-    if( taskHandle!=nullptr )
+    // Stop Code
+    DAQmxStopTask(taskHandle);
+
+}
+
+double* daq::collect_data( void ) {
+    if (DAQ_enabled) {
+        dataAcquisition(analogInputVoltages);
+
+        double tempVoltages[6];
+        for (int v = 0; v<6; v++)
+        {
+            tempVoltages[v] = analogInputVoltages[v]-ATINanoVoltageOffsets[v];
+        }
+        MatrixMultVect6(ATINanoCalibrationMatrix, tempVoltages, ATINanoForceTorque);
+        /*for (int v = 0; v<6; v++)
+        {
+            qDebug() << ATINanoForceTorque[v];
+        }*/
+        return ATINanoForceTorque;
+    }
+}
+
+void daq::MatrixMultVect6(const double C[6][6], double D[6], double E[6])
+{
+    // This function returns the matrix multiplication of C*D=E
+    // Where C is a 6x6 matrix and D is a 6x1 vector and thus E is
+    // the resulting 6x1 vector.
+    // The vector E is a buffer array that is passed by reference and editted
+    // to receive the result of the matrix multiplication.
+
+    double num;
+
+    for ( int i = 0; i < 6; i++ )
     {
-        // Stop Code
-        DAQmxStopTask(taskHandle);
-        DAQmxClearTask(taskHandle);
+        num = 0.0;
+        for ( int k = 0; k < 6; k++ )
+        {
+            num = C[i][k]*D[k] + num;
+        }
+        E[i] = num;
     }
 }

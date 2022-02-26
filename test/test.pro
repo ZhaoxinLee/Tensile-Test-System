@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport
+QT       += core gui serialport gamepad
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,16 +25,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        callbacks.cpp \
         daq.cpp \
+        joystick.cpp \
         main.cpp \
         mainwindow.cpp \
         serialworker.cpp
 
 HEADERS += \
         NIDAQmx.h \
-        callbacks.h \
         daq.h \
+        joystick.h \
         mainwindow.h \
         serialworker.h
 

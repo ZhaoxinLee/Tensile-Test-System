@@ -2,10 +2,7 @@
 #define SERIALWORKER_H
 
 #include <QObject>
-#include <QMessageBox>
 #include <QDebug>
-#include <QIODevice>
-#include <QByteArray>
 
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>

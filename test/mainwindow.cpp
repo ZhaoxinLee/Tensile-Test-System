@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    /* check serial port info for Arduino
+    /* uncomment this module to check serial port info for Arduino
     qDebug()<<"Number of available ports:"<<QSerialPortInfo::availablePorts().length();
     foreach(const QSerialPortInfo &serialPortInfo, QSerialPortInfo::availablePorts()){
             qDebug() << "Has vendor ID: " << serialPortInfo.hasVendorIdentifier();
@@ -19,39 +19,49 @@ MainWindow::MainWindow(QWidget *parent)
                 qDebug() << "Product ID: " << serialPortInfo.productIdentifier();
             }
         }*/
-
-    arduino->moveToThread(thread);
-//    connect(arduino,SIGNAL(error(QString)),this,SLOT(errorString(QString)));
-    connect(thread, SIGNAL(started()), arduino, SLOT(connect()));
-    connect(arduino, SIGNAL(finished()), thread, SLOT(quit()));
+//--------------------------------------------------------------------Arduino--------------------------------------------------------------------------------------------
+    arduino->moveToThread(arduino_thread);
+    connect(arduino_thread, SIGNAL(started()), arduino, SLOT(connect()));
+    connect(arduino, SIGNAL(finished()), arduino_thread, SLOT(quit()));
     connect(arduino, SIGNAL(finished()), arduino, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(arduino_thread, SIGNAL(finished()), arduino_thread, SLOT(deleteLater()));
 
     connect(ui->moveButton,SIGNAL(clicked()),SLOT(move_gantry()));
     connect(ui->centerButton,SIGNAL(clicked()),SLOT(center_gantry()));
     connect(ui->zeroButton,SIGNAL(clicked()),SLOT(zero_gantry()));
-//    connect(ui->moveServo,SIGNAL(clicked()),SLOT(servoMove()));
 
     connect(this,SIGNAL(serial_sent(const char*)),arduino,SLOT(pass_on_to_arduino(const char*)));
     connect(arduino,SIGNAL(serial_received(QStringList)),this,SLOT(update_position_UI(QStringList)));
-    thread -> start();
+    arduino_thread -> start();
 
-    connect(callbacktimer, SIGNAL(timeout()), this, SLOT(callbacks()));
-    callbacktimer->start(callbackRefreshPeriod);
+    //connect(callbacktimer, SIGNAL(timeout()), this, SLOT(callbacks()));
+    //callbacktimer->start(callbackRefreshPeriod);
+
+//--------------------------------------------------------------------Load Cell--------------------------------------------------------------------------------------------
+    daq_timer->setInterval(daq_refresh_period);
+    connect(ui->ATI_connect_btn,SIGNAL(clicked()),SLOT(enableDAQ()));
+    connect(ui->ATI_connect_btn,SIGNAL(clicked()),daq_timer,SLOT(start()));
+    connect(daq_timer,SIGNAL(timeout()),this,SLOT(update_ATI_labels()));
+    connect(ui->ATI_disconnect_btn,SIGNAL(clicked()),SLOT(disableDAQ()));
+
+//--------------------------------------------------------------------Joystick--------------------------------------------------------------------------------------------
+    connect(ui->enableJoystick,SIGNAL(clicked()),SLOT(enableJoystick()));
+
+
 }
 
 MainWindow::~MainWindow()
 {
     // STOP DAQ from running
-    if ( DAQ.isEnabled() )
-    {
-        qInfo() << "Disconnecting NI USB-DAQ.";
-        DAQ.finishTask();
-    }
+
+    qInfo() << "Exiting NI USB-DAQ.";
+    DAQ.finishTask();
 
     delete ui;
 }
 
+
+//--------------------------------------------------------------------Arduino--------------------------------------------------------------------------------------------
 void MainWindow::write_to_arduino( const char* commandLine ) {
     emit serial_sent( commandLine );
 }
@@ -75,14 +85,45 @@ void MainWindow::center_gantry( void ) {
 }
 
 void MainWindow::update_position_UI(QStringList gantry_positions_targets) {
-
-//    qDebug() << commandLine[0];
-
     ui->currentX->setText(gantry_positions_targets[0]);
     ui->currentY->setText(gantry_positions_targets[1]);
     ui->currentZ->setText(gantry_positions_targets[2]);
     ui->targetX->setText(gantry_positions_targets[3]);
     ui->targetY->setText(gantry_positions_targets[4]);
     ui->targetZ->setText(gantry_positions_targets[5]);
-//    ui->currentServoPosition->setText(tr("%1").arg(commandLine[6]));
+}
+
+//--------------------------------------------------------------------Load Cell--------------------------------------------------------------------------------------------
+void MainWindow::enableDAQ()
+{
+    qInfo() << "DAQ Connected";
+    DAQ.enable();
+    DAQ.setupTask();
+}
+
+void MainWindow::disableDAQ()
+{
+    qInfo() << "DAQ Disconnected";
+    DAQ.stopTask();
+    DAQ.disable();
+}
+
+void MainWindow::update_ATI_labels() {
+    if (DAQ.isEnabled())
+    {
+        double* ATINanoForceTorque = DAQ.collect_data();
+        ui->force_x->setNum(ATINanoForceTorque[0]);
+        ui->force_y->setNum(ATINanoForceTorque[1]);
+        ui->force_z->setNum(ATINanoForceTorque[2]);
+        ui->torque_x->setNum(ATINanoForceTorque[3]);
+        ui->torque_y->setNum(ATINanoForceTorque[4]);
+        ui->torque_z->setNum(ATINanoForceTorque[5]);
+    }
+}
+
+//--------------------------------------------------------------------Joystick--------------------------------------------------------------------------------------------
+void MainWindow::enableJoystick(void)
+{
+    // Enable the controller if the checkbox is checked
+    joy->enableController();
 }

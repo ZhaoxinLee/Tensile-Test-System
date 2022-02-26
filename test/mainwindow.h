@@ -5,15 +5,13 @@
 #include <QDebug>
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
-#include <QMessageBox>
-#include <QIODevice>
 #include <QThread>
 #include <QTimer>
-#include <string.h>
+#include <cmath>
 
 #include "serialworker.h"
 #include "daq.h"
-//#include "mathfunctions.h"
+#include "joystick.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,12 +25,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
-    serialworker* arduino = new serialworker();
+    serialworker *arduino = new serialworker();
 
     daq DAQ;
-
-    QTimer *callbacktimer = new QTimer(this);
-    const int callbackRefreshPeriod = 10; // 20 ms correlates to 50 Hz
+    QTimer *daq_timer = new QTimer();
+    const int daq_refresh_period = 100; // ms
 
     const double ATINanoVoltageOffsets[6] = {-1.3171104,	3.8164696,	2.2166968,	1.9402872,	-0.44156372,	-1.0281404};
     const double ATINanoCalibrationMatrix[6][6] =  {{  0.00749,	 0.02250,	 0.01747,	-0.80775,	-0.02452,	 0.81951},
@@ -42,23 +39,30 @@ public:
                                                    { -5.88807,	-0.35924,	 2.76672,	 4.91801,	 3.46558,	-4.95869},
                                                    { -0.17835,	 3.57785,	-0.02007,	 3.30164,	-0.08660,	 3.66835}};
     double ATINanoForceTorque[6] = {0.0};
+
+    Joystick *joy = new Joystick();
+
 private:
     Ui::MainWindow *ui;
 
-    QThread* thread = new QThread();
+    QThread* arduino_thread = new QThread();
+
+
+public slots:
+    void enableDAQ(void);
+    void disableDAQ(void);
+
+    void enableJoystick(void);
 
 private slots:
 
-    void callbacks( void );
-
     void write_to_arduino( const char* );
     void update_position_UI( QStringList );
-
     void move_gantry( void );
     void zero_gantry( void );
     void center_gantry( void );
 
-//    void servoMove( void );
+    void update_ATI_labels();
 
 signals:
     void serial_sent( const char* );
